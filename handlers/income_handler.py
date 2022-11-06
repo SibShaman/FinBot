@@ -1,15 +1,7 @@
 # amount - сумма которая будет заносится в базу данных
 # description - описание
 # kind_income - статья доходов
-        # 2.1 Учет доходов:
-        # - доходы от продажи основных средств
-        # - доходы от реализации товара
-        # - доходы за оказание услуг
-        # - инвестиции
-        # - кредититование
-        # - аренда(техники, имущества, зданий и сооружений)
-        # - формирование дебиторской задолженности(сдача проекта, внесение суммы задолженности, готовность проекта)
-        # - прочие
+
 # project - название проекта по которому будет проходить соответствующая сумма
 # date_income - дата прихода
 # date_change_income - дата внесения записи (или изменения)
@@ -43,7 +35,7 @@ async def initial_state(call: types.CallbackQuery):
 
 
 @dp.message_handler(state=FSMAddIncome.amount)
-async def add_first_name(message: types.Message, state: FSMContext):
+async def add_amount(message: types.Message, state: FSMContext):
     """ Добавление суммы - вводим переключаемся на следующее состояние"""
     async with state.proxy() as data:
         data['amount'] = message.text
@@ -53,17 +45,27 @@ async def add_first_name(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=FSMAddIncome.description)
-async def add_second_name(message: types.Message, state: FSMContext):
+async def add_description(message: types.Message, state: FSMContext):
     """ Добавление описания - вводим и переключаемся на следующее состояние"""
     async with state.proxy() as data:
         data['description'] = message.text
     # переключаемся на следующее состояние
     await FSMAddIncome.next()
-    await message.answer('Введите вид расхода из предложенных')
+    await message.answer('Введите вид дохода из предложенных')
 
+
+# 2.1 Учет доходов:
+# - доходы от продажи основных средств
+# - доходы от реализации товара
+# - доходы за оказание услуг
+# - инвестиции
+# - кредититование
+# - аренда(техники, имущества, зданий и сооружений)
+# - формирование дебиторской задолженности(сдача проекта, внесение суммы задолженности, готовность проекта)
+# - прочие
 
 @dp.message_handler(state=FSMAddIncome.kind_income)
-async def add_second_name(message: types.Message, state: FSMContext):
+async def add_kind_income(message: types.Message, state: FSMContext):
     """ Добавление вида доходов - вводим и переключаемся на следующее состояние"""
     async with state.proxy() as data:
         data['kind_income'] = message.text
@@ -73,7 +75,7 @@ async def add_second_name(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=FSMAddIncome.project)
-async def add_second_name(message: types.Message, state: FSMContext):
+async def add_name_project(message: types.Message, state: FSMContext):
     """ Добавление названия проекта - вводим переключаемся на следующее состояние"""
     async with state.proxy() as data:
         data['project'] = message.text
@@ -83,21 +85,19 @@ async def add_second_name(message: types.Message, state: FSMContext):
 
 
 @dp.message_handler(state=FSMAddIncome.date_income)
-async def add_second_name(message: types.Message, state: FSMContext):
-    """ Добавление даты прихода - вводим переключаемся на следующее состояние"""
+async def add_date_income(message: types.Message, state: FSMContext):
+    """ Добавление даты прихода и дату и время записи в БД - вводим и выходим из машины состояний"""
     async with state.proxy() as data:
         data['date_income'] = message.text
     # переключаемся на следующее состояние
     await FSMAddIncome.next()
-    await message.answer('дата записи вводится автоматически')
-
-
-@dp.message_handler(state=FSMAddIncome.date_write)
-async def add_second_name(message: types.Message, state: FSMContext):
-    """ Добавление даты записи - берет автоматом и выходит из машины состояний"""
+    # Записываем текущую дату
     async with state.proxy() as data:
-        data['date_write'] = datetime.datetime.now()
-    await message.answer('Готово')
-# передать данные куда то
-    await state.finish()
-    await start_handler(message)
+        my_date = datetime.datetime.now()
+        data['date_write'] = str(my_date)   # передать данные куда то
+        await message.answer(str(data))
+        await message.answer('Готово')
+
+    await state.finish()    # выход из машины состояний
+    await start_handler(message)    # Возврат меню
+
