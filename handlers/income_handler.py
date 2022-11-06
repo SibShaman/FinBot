@@ -55,7 +55,6 @@ async def add_description(message: types.Message, state: FSMContext):
     await message.answer('Введите вид дохода из предложенных', reply_markup=markup)
 
 
-
 @dp.message_handler(state=FSMAddIncome.kind_income)
 async def add_kind_income(message: types.Message, state: FSMContext):
     """ Добавление вида доходов - вводим и переключаемся на следующее состояние"""
