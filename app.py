@@ -1,6 +1,5 @@
 from flask import Flask
-import handlers
-
+from handlers.main_handler import run_bot
 
 app = Flask(__name__)
 
@@ -9,7 +8,7 @@ app = Flask(__name__)
 # def hello_world():  # put application's code here
 #     return 'Hello World!'
 
-handlers.run_bot()
+run_bot()
 
 if __name__ == '__main__':
     app.run()
