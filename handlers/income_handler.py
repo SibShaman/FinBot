@@ -1,12 +1,4 @@
-# amount - сумма которая будет заносится в базу данных
-# description - описание
-# kind_income - статья доходов
-
-# project - название проекта по которому будет проходить соответствующая сумма
-# date_income - дата прихода
-# date_change_income - дата внесения записи (или изменения)
-
-
+"""Хендлер для обработки суммы входящего дохода"""
 from aiogram import types
 import datetime
 from aiogram.dispatcher import FSMContext
@@ -17,12 +9,12 @@ from handlers.create_handler import dp, my_command
 
 class FSMAddIncome(StatesGroup):
     """Класс для временного хранилища информации"""
-    amount = State()
-    description = State()
-    kind_income = State()
-    project = State()
-    date_income = State()
-    date_write = State()
+    amount = State()    # amount - сумма которая будет заносится в базу данных
+    description = State()   # description - описание
+    kind_income = State()   # kind_income - статья доходов
+    project = State()   # project - название проекта по которому будет проходить соответствующая сумма
+    date_income = State()   # date_income - дата прихода
+    date_write = State()    # date_change_income - дата внесения записи (или изменения)
 
 
 @dp.callback_query_handler(my_command.filter(action='add_income'), state=None)
@@ -53,8 +45,7 @@ async def add_description(message: types.Message, state: FSMContext):
     await FSMAddIncome.next()
     await message.answer('Введите вид дохода из предложенных')
 
-
-# 2.1 Учет доходов:
+# Добавить в виде доп.меню
 # - доходы от продажи основных средств
 # - доходы от реализации товара
 # - доходы за оказание услуг
@@ -63,6 +54,7 @@ async def add_description(message: types.Message, state: FSMContext):
 # - аренда(техники, имущества, зданий и сооружений)
 # - формирование дебиторской задолженности(сдача проекта, внесение суммы задолженности, готовность проекта)
 # - прочие
+
 
 @dp.message_handler(state=FSMAddIncome.kind_income)
 async def add_kind_income(message: types.Message, state: FSMContext):
@@ -100,4 +92,3 @@ async def add_date_income(message: types.Message, state: FSMContext):
 
     await state.finish()    # выход из машины состояний
     await start_handler(message)    # Возврат меню
-
