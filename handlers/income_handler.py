@@ -43,17 +43,17 @@ async def add_description(message: types.Message, state: FSMContext):
         data['description'] = message.text
     # переключаемся на следующее состояние
     await FSMAddIncome.next()
-    await message.answer('Введите вид дохода из предложенных')
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True, selective=True)
+    markup.add('Продажа ОС',
+               'Реализация товара',
+               'Оказание услуг',
+               'Инвестиции',
+               'Кредититование',
+               'Аренда',
+               'Дебиторская задолженность',
+               'Прочее')
+    await message.answer('Введите вид дохода из предложенных', reply_markup=markup)
 
-# Добавить в виде доп.меню
-# - доходы от продажи основных средств
-# - доходы от реализации товара
-# - доходы за оказание услуг
-# - инвестиции
-# - кредититование
-# - аренда(техники, имущества, зданий и сооружений)
-# - формирование дебиторской задолженности(сдача проекта, внесение суммы задолженности, готовность проекта)
-# - прочие
 
 
 @dp.message_handler(state=FSMAddIncome.kind_income)
@@ -63,7 +63,7 @@ async def add_kind_income(message: types.Message, state: FSMContext):
         data['kind_income'] = message.text
     # переключаемся на следующее состояние
     await FSMAddIncome.next()
-    await message.answer('Введите название проекта')
+    await message.answer('Введите название проекта', reply_markup=types.ReplyKeyboardRemove())
 
 
 @dp.message_handler(state=FSMAddIncome.project)
