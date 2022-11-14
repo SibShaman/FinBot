@@ -11,6 +11,11 @@ async def start_handler(message: types.Message):
             text='Добавить доход', callback_data=my_command.new(action='add_income')),
         types.InlineKeyboardButton(
             text='Добавить расход', callback_data=my_command.new(action='add_expense')),
+        # откорректировать добавленые данные
+
+        # добавить проект
+        # изменить статус проекта
+
         # types.InlineKeyboardButton(
         #     text='Показать всю книгу', callback_data=my_command.new(action='show_contact')),
     ]
