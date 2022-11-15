@@ -5,7 +5,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from handlers.main_handler import start_handler
 from handlers.create_handler import dp, my_command
-from db.service_db import mysql_connect
+from db.servce_db import mysql_connect
 
 
 class FSMAddIncome(StatesGroup):
@@ -65,7 +65,7 @@ async def add_kind_income(message: types.Message, state: FSMContext):
     cursor = mysql_connect.cursor()
     sql_project = "SELECT name FROM projects"
     cursor.execute(sql_project)
-    mysql_connect.commit()
+    # mysql_connect.commit()
     row = (item[0] for item in cursor.fetchall())
     for a in row:
         markup_project.add(a)
@@ -92,22 +92,26 @@ async def add_date_income(message: types.Message, state: FSMContext):
     # Записываем текущую дату
     async with state.proxy() as data:
         my_date = datetime.datetime.now()
-        data['date_write'] = str(my_date)   # передать данные куда то
+        data['date_write'] = str(my_date)
+        # это вставка того что получилось в базу данных
+        amount = data['amount']
+        description = data['description']
+    # Вид дохода и тип проекта стоит корявый, надо проверку добавить и вставлять тот который выбирает user
+        # kind_income = data['kind_income']
+        # project_id = data['project']
+        kind_income = int(1)
+        project_id = int(1)
+        created_at = data['date_income']
+        update_at = data['date_write']
 
-        # это подключение, создание курсора, и вывод на экран версию MySQL
-        # my_data = str(data)
-        # with mysql_connect:
-        #     cursor = mysql_connect.cursor()
-        #     sql = "SELECT * FROM kind_income"
-        #     cursor.execute(sql)
-        #     mysql_connect.commit()
-        #     rezult = cursor.fetchall()
-        #     print(rezult)
-        #     cur.execute("SELECT VERSION()")
-        #     version = cursor.fetchone()
-        #     print("Database version: {}".format(version[0]))
+        cursor = mysql_connect.cursor()
+        sql = "INSERT INTO income (amount, description, kind_income_id, project_id, created_at, update_at)" \
+              "VALUES (%s,%s,%s,%s,%s,%s)"
+        t = (amount, description, kind_income, project_id, created_at, update_at)
+        cursor.execute(sql, t)
+        mysql_connect.commit()
+        mysql_connect.close()
 
-        await message.answer(str(data))
         await message.answer('Готово')
 
     await state.finish()    # выход из машины состояний
